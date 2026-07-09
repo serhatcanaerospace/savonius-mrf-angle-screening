@@ -1,0 +1,20 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      MRFProperties;
+}
+
+MRF1
+{
+    cellZone        rotor;   // created by system/topoSetDict (cylinderToCell), no AMI/faceZone involved
+    active          yes;
+
+    nonRotatingPatches ();
+
+    origin          (1 1 0);
+    axis            (0 0 1);
+    omega           10.6336;   // rad/s, TSR = 0.8 at U_inf = 6 m/s, R = 0.4511 m
+}

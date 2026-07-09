@@ -1,0 +1,38 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      topoSetDict;
+}
+
+// Defines the MRF rotor cellZone directly from cell centres (cylinderToCell),
+// completely independent of any surface geometry / AMI concept. Radius 0.6 m
+// comfortably encloses the rotor blade tip (R = 0.4511 m) with margin.
+
+actions
+(
+    {
+        name    rotorCells;
+        type    cellSet;
+        action  new;
+        source  cylinderToCell;
+        sourceInfo
+        {
+            p1     (1 1 -1);
+            p2     (1 1  1);
+            radius 0.6;
+        }
+    }
+
+    {
+        name    rotor;
+        type    cellZoneSet;
+        action  new;
+        source  setToCellZone;
+        sourceInfo
+        {
+            set rotorCells;
+        }
+    }
+);

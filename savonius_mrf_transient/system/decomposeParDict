@@ -1,0 +1,19 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      decomposeParDict;
+}
+
+// MRF case: no faceZones/AMI exist, so no singleProcessorFaceSets/
+// preserveFaceZones constraints are needed. Local machine has 16 cores.
+
+numberOfSubdomains 8;
+
+method          scotch;
+distributed     no;
+roots           ( );
+
+preservePatches (Savonius);
