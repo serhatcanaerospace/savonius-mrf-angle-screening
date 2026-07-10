@@ -1,0 +1,127 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      snappyHexMeshDict;
+}
+
+// MRF case: snappyHexMesh is used ONLY to cut the blade hole and refine the
+// mesh around the rotor. The rotor cellZone is NOT created here (that used
+// to be done via a second "AMI" surface with faceZone/cellZone, which is an
+// AMI/sliding-mesh concept and doesn't belong in an MRF case) - it is
+// created afterwards with topoSet (see system/topoSetDict), a plain
+// cylinderToCell selection with no surface/baffle involved at all.
+
+castellatedMesh true;
+snap            true;
+addLayers       false;
+
+geometry
+{
+    rotorBlade.stl { type triSurfaceMesh; name Savonius; }
+
+    // Used only for local background refinement around the rotor - a plain
+    // geometric helper, not tied to any AMI/interface concept.
+    refineZone
+    {
+        type searchableCylinder;
+        point1 (1 1 -1);
+        point2 (1 1  1);
+        radius 0.5;
+    }
+
+    // Downstream wake refinement box - flow direction is +x (inlet at x=-9,
+    // outlet at x=18, rotor at x=1). Covers the near-to-mid wake for a
+    // cleaner animation of vortex shedding, without refining the whole
+    // domain (keeps cell count manageable).
+    wakeZone
+    {
+        type searchableBox;
+        min (1.4  -2.5 -1);
+        max (9.0   3.5  1);
+    }
+};
+
+castellatedMeshControls
+{
+    maxLocalCells 150000;
+    maxGlobalCells 700000;
+    minRefinementCells 100;
+    nCellsBetweenLevels 6;
+
+    features ();
+
+    refinementSurfaces
+    {
+        Savonius { level (1 3); }
+    }
+
+    resolveFeatureAngle 30;
+
+    refinementRegions
+    {
+        refineZone { mode inside; levels ((4 4)); }
+        wakeZone   { mode inside; levels ((2 2)); }
+    }
+
+    locationInMesh (1 2 0.1);   // known-good point: outside blade, inside bulk fluid
+    allowFreeStandingZoneFaces true;
+}
+
+snapControls
+{
+    nSmoothPatch 3;
+    tolerance 4.0;
+    nSolveIter 300;
+    nRelaxIter 5;
+    nFeatureSnapIter 20;
+    implicitFeatureSnap true;
+    explicitFeatureSnap false;
+    multiRegionFeatureSnap true;
+}
+
+addLayersControls
+{
+    relativeSizes true;
+
+    layers
+    {
+        Savonius { nSurfaceLayers 2; }
+    }
+
+    expansionRatio 1.1;
+    finalLayerThickness 0.2;
+    minThickness 0.002;
+    nGrow 0;
+    featureAngle 90;
+    nRelaxIter 5;
+    nSmoothSurfaceNormals 1;
+    nSmoothNormals 3;
+    nSmoothThickness 10;
+    maxFaceThicknessRatio 0.7;
+    maxThicknessToMedialRatio 0.3;
+    minMedianAxisAngle 90;
+    nBufferCellsNoExtrude 0;
+    nLayerIter 50;
+}
+
+meshQualityControls
+{
+    maxNonOrtho 65;
+    maxBoundarySkewness 4;
+    maxInternalSkewness 4;
+    maxConcave 80;
+    minVol 1e-13;
+    minTetQuality 1e-30;
+    minArea -1;
+    minTwist 0.05;
+    minDeterminant 0.005;
+    minFaceWeight 0.05;
+    minVolRatio 0.01;
+    minTriangleTwist -1;
+    nSmoothScale 4;
+    errorReduction 0.75;
+}
+
+mergeTolerance 1e-6;

@@ -1,0 +1,3 @@
+topAndBottom { type slip; }
+front        { type symmetryPlane; }
+back         { type symmetryPlane; }

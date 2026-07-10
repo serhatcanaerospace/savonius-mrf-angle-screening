@@ -1,0 +1,23 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      createPatchDict;
+}
+
+// MRF case: keep the thin front/back planes as symmetryPlane patches.
+// snappyHexMesh does not preserve a strict one-face-per-cell empty topology
+// around this closed STL, so using empty here makes checkMesh reject an
+// otherwise good quasi-3D mesh. This remains a thin symmetry model.
+// The mesh is a single, fully connected region throughout (no interface
+// split of any kind); the MRF rotor cellZone is tagged separately by
+// system/topoSetDict, run after this step.
+
+pointSync false;
+
+patches
+(
+    { name front; patchInfo { type symmetryPlane; } constructFrom patches; patches (symFront); }
+    { name back;  patchInfo { type symmetryPlane; } constructFrom patches; patches (symBack);  }
+);
