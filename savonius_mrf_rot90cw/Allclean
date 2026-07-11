@@ -1,0 +1,15 @@
+#!/bin/bash
+cd "${0%/*}" || exit 1
+
+source "${HOME}/OpenFOAM/OpenFOAM-8/etc/bashrc"
+. "$WM_PROJECT_DIR"/bin/tools/CleanFunctions
+
+cleanCase
+
+rm -rf constant/polyMesh
+rm -rf 0/polyMesh
+rm -rf VTK postProcessing
+rm -f log.* *.foam
+rm -rf processor*
+
+echo "Allclean finished. Only 0/, constant/ (dicts + rotated STL), system/ remain."

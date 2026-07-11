@@ -1,0 +1,4 @@
+template_case=../savonius_mrf
+source_stl=../geometry/rotorBlade_horizontal.stl
+angle_deg=45.0
+rotation_sign=+CCW,-CW

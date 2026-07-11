@@ -1,0 +1,26 @@
+# OpenFOAM generated data
+constant/polyMesh/
+postProcessing/
+VTK/
+processor*/
+dynamicCode/
+*.foam
+log.*
+*.log
+[1-9]*/
+0.[0-9]*/
+
+# Python/cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+
+# Local/generated reports
+*.docx
+*.odt
+*.pptx
+server.log
+archive/
+docs/internal/
+

@@ -1,0 +1,30 @@
+#!/bin/bash
+cd "${0%/*}" || exit 1
+
+source "${HOME}/OpenFOAM/OpenFOAM-8/etc/bashrc"
+. "$WM_PROJECT_DIR"/bin/tools/RunFunctions
+set -e
+
+# Transient MRF (pimpleFoam): kanat acisi donuk (savonius_mrf ile ayni),
+# ama akis alani gercek zamanda gelisiyor. system/controlDict'teki
+# endTime'i degistirip devam ettirmek icin startFrom'u latestTime yap ve
+# bu script'i tekrar calistir - mevcut zaman adimindan devam eder.
+#
+# BILINEN SORUN: onceki denemede t=~0.042s civarinda deltaT surekli
+# kuculup ilerleme durmustu (bkz. DURUM_RAPORU_ve_YAPILACAKLAR.md
+# bolum 8-9) - gercek fiziksel kararsizlik mi yoksa mesh kalite sorunu mu
+# oldugu netlesmedi. Uzun bir endTime hedefliyorsan ilerlemeyi izle.
+
+if [ ! -d constant/polyMesh ]; then
+    ./Allrun-pre
+fi
+
+runApplication -overwrite checkMesh -allTopology -allGeometry
+if grep -Eq 'Total number of faces on empty patches|highly skew|Cells with small determinant|negative volume|zero or negative face area|Face area magnitudes.*Failed|Cell volumes.*Failed|Number of regions: ([2-9]|[1-9][0-9]+)' log.checkMesh; then
+    echo "HATA: mesh kalite kontrollerinden kaldi; pimpleFoam baslatilmadi. log.checkMesh dosyasini inceleyin."
+    exit 1
+fi
+
+runApplication -overwrite pimpleFoam
+
+echo "Allrun finished. Cm/Cd/Cl: postProcessing/forceCoeffs1/0/forceCoeffs.dat"

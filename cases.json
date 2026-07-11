@@ -1,0 +1,33 @@
+{
+  "cases": [
+    {
+      "id": "savonius_mrf",
+      "path": "savonius_mrf",
+      "solver": "simpleFoam",
+      "role": "Main steady MRF reference case",
+      "runnable": true
+    },
+    {
+      "id": "savonius_mrf_rot90cw",
+      "path": "savonius_mrf_rot90cw",
+      "solver": "simpleFoam",
+      "role": "Frozen-rotor angle case, -90 deg",
+      "runnable": true
+    },
+    {
+      "id": "savonius_mrf_rot45ccw",
+      "path": "savonius_mrf_rot45ccw",
+      "solver": "simpleFoam",
+      "role": "Frozen-rotor angle case, +45 deg",
+      "runnable": true
+    },
+    {
+      "id": "savonius_mrf_transient",
+      "path": "savonius_mrf_transient",
+      "solver": "pimpleFoam",
+      "role": "Transient MRF smoke/stability case",
+      "runnable": true
+    }
+  ]
+}
+

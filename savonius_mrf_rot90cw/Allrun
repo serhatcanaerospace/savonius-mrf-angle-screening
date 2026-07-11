@@ -1,0 +1,26 @@
+#!/bin/bash
+cd "${0%/*}" || exit 1
+
+source "${HOME}/OpenFOAM/OpenFOAM-8/etc/bashrc"
+. "$WM_PROJECT_DIR"/bin/tools/RunFunctions
+set -e
+
+# NOT: constant/triSurface/rotorBlade.stl bu case'de rotor merkezi (1,1,0)
+# etrafinda -90 derece (saat yonunde) dondurulmustur (bkz.
+# analysis_scripts/rotate_blade.py). savonius_mrf'in orijinal (yatay) STL'i
+# ile KARISTIRILMAMALI.
+
+if [ ! -d constant/polyMesh ]; then
+    ./Allrun-pre
+fi
+
+runApplication -overwrite checkMesh -allTopology -allGeometry
+if grep -Eq 'Total number of faces on empty patches|highly skew|Cells with small determinant|negative volume|zero or negative face area|Face area magnitudes.*Failed|Cell volumes.*Failed|Number of regions: ([2-9]|[1-9][0-9]+)' log.checkMesh; then
+    echo "HATA: mesh kalite kontrollerinden kaldi; simpleFoam baslatilmadi. log.checkMesh dosyasini inceleyin."
+    exit 1
+fi
+
+runApplication -overwrite simpleFoam
+
+echo "Allrun finished. Cm/Cd/Cl: postProcessing/forceCoeffs1/0/forceCoeffs.dat"
+echo "NOT: bu koşu 90 derece döndürülmüş kanat denemesidir, tam yakınsamamış olabilir (bkz. DURUM_RAPORU_ve_YAPILACAKLAR.md bölüm 9)."
